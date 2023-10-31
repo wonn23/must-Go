@@ -1,24 +1,45 @@
-// schedule.service.ts
-
-import { Injectable } from '@nestjs/common'
-import { Cron, CronExpression } from '@nestjs/schedule'
-import axios from 'axios'
+import { Injectable } from '@nestjs/common/decorators'
+import { ConfigService } from '@nestjs/config'
+import { HttpService } from '@nestjs/axios'
+import { lastValueFrom } from 'rxjs'
 
 @Injectable()
 export class ScheduleService {
-  @Cron(CronExpression.EVERY_HOUR) // 매 시간마다 실행 (필요에 따라 조절)
-  async fetchDataFromOpenAPI() {
-    try {
-      // OpenAPI에서 데이터를 가져오는 요청 예제
-      const response = await axios.get(
-        `https://openapi.gg.go.kr/Genrestrtlunch?key=41a78115926c4c76b39caf0d7be93b6e&type=json&pIndex=2&pSize=1000`,
-      )
-      const data = response.data
+  constructor(
+    private configService: ConfigService,
+    private httpService: HttpService,
+  ) {}
 
-      // 데이터를 활용한 로직을 여기에 추가
-      console.log('데이터 가져오기 성공:', data)
-    } catch (error) {
-      console.error('데이터 가져오기 실패:', error.message)
+  async getPlaceData() {
+    const key = await this.configService.get<string>('schedule.apiKey')
+    const foodList = ['jpnfood', 'chifood', 'lunch']
+    let pIndex = 1
+    let pSize = 1000
+    let GenrestrtFood = ''
+
+    const dataCollection = {}
+    for (const food of foodList) {
+      let collectedData = []
+      const apiUrl = `https://openapi.gg.go.kr/Genrestrt${food}?KEY=${key}&Type=json&pIndex=${pIndex}&pSize=${pSize}`
+      const response = await lastValueFrom(this.httpService.get(apiUrl))
+      GenrestrtFood = 'Genrestrt' + food
+      const totalCount =
+        response.data[GenrestrtFood][0].head[0].list_total_count
+      collectedData = collectedData.concat(response.data[GenrestrtFood][1].row)
+
+      const totalPages = Math.ceil(totalCount / pSize)
+      for (let i = 2; i <= totalPages; i++) {
+        const nextPageUrl = `https://openapi.gg.go.kr/Genrestrt${food}?KEY=${key}&Type=json&pIndex=${pIndex}&pSize=${pSize}`
+        const nextPageResponse = await lastValueFrom(
+          this.httpService.get(nextPageUrl),
+        )
+        collectedData = collectedData.concat(
+          nextPageResponse.data[GenrestrtFood][1].row,
+        )
+      }
+      dataCollection[food] = collectedData
     }
+
+    return dataCollection
   }
 }
