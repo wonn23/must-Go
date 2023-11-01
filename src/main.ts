@@ -16,7 +16,7 @@ async function bootstrap() {
           format: winston.format.combine(
             winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // 날짜 형식
             winston.format.prettyPrint({ colorize: true }),
-            winston.format.label({ label: 'foodfood' }), // 프로젝트 명
+            winston.format.label({ label: 'must-go' }), // 프로젝트 명
             winston.format.printf(({ level, message, label, timestamp }) => {
               let logColor
               /*
