@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserRepository } from './user.repository'
 import { RegisterUserDto } from './dto/registerUser.dto'
+import { User } from './entities/user.entity'
 import * as bcrypt from 'bcryptjs'
 
 @Injectable()
@@ -37,5 +38,9 @@ export class UserService {
       }
       throw new InternalServerErrorException('회원가입에 실패 했습니다.')
     }
+  }
+
+  async getUserInfo(userName: string): Promise<User> {
+    return this.userRepository.findByUsernameExceptPW(userName)
   }
 }
