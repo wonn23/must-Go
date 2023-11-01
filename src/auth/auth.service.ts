@@ -7,16 +7,15 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { InjectRepository } from '@nestjs/typeorm'
 import { SignInDto } from './dto/signin.dto'
-import { User } from 'src/user/entities/user.entity'
-import { Repository } from 'typeorm'
+import { UserRepository } from 'src/user/user.repository'
 import * as bcrypt from 'bcrypt'
 import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(UserRepository)
+    private usersRepository: UserRepository,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {}
@@ -25,7 +24,7 @@ export class AuthService {
     try {
       const { username, password } = signInDto
 
-      const user = await this.usersRepository.findOne({ where: { username } })
+      const user = await this.usersRepository.findByUsername(username)
 
       if (!user) throw new UnprocessableEntityException('해당 유저가 없습니다.')
 
