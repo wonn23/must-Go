@@ -13,7 +13,7 @@ export const typeORMConfig = async (
     password: configService.get<string>('DB_PASSWORD') || '0000',
     database: configService.get<string>('DB_DATABASE') || 'postgres',
     entities: [__dirname + '/../**/*.entity.{js,ts}'],
-    synchronize: configService.get<boolean>('DB_SYNCHRONIZE') || false,
+    synchronize: configService.get<string>('DB_SYNCHRONIZE') === 'true',
     namingStrategy: new SnakeNamingStrategy(),
     // logging: true,
   }

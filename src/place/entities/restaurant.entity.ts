@@ -7,7 +7,7 @@ import {
 } from 'typeorm'
 
 @Entity()
-export class Place extends BaseEntity {
+export class Restaurant extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -17,7 +17,7 @@ export class Place extends BaseEntity {
   nameAddress: string
 
   @Column()
-  city: string
+  countyName: string
 
   @Column()
   name: string
@@ -28,12 +28,6 @@ export class Place extends BaseEntity {
   @Column()
   address: string
 
-  @Column({
-    type: 'enum',
-    enum: ['open', 'closure'],
-  })
-  status: string
-
   @Column()
   lat: string
 
@@ -42,4 +36,7 @@ export class Place extends BaseEntity {
 
   @Column()
   score: number
+
+  // @ManyToOne(() => Rating, (rating) => restaurants)
+  // rating: Rating
 }
