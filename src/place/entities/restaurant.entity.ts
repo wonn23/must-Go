@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { statusEnum } from '../types/restaurant.enum'
 
 @Entity()
 export class Restaurant extends BaseEntity {
@@ -28,6 +29,9 @@ export class Restaurant extends BaseEntity {
 
   @Column()
   address: string
+
+  @Column({ type: 'enum', enum: statusEnum, default: statusEnum.unconfirmed })
+  status: statusEnum
 
   @Column()
   lat: string

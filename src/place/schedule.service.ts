@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/axios'
 import { lastValueFrom } from 'rxjs'
 import { RestaurantRepository } from './restaurant.repository'
 import { Cron } from '@nestjs/schedule'
+import { statusEnum } from './types/restaurant.enum'
 
 @Injectable()
 export class ScheduleService {
@@ -16,14 +17,15 @@ export class ScheduleService {
   ) {}
 
   @Cron('0 1 * * 5')
-  sendRequest() {
+  async sendRequest() {
     this.logger.debug('Called every Friday at 1 AM')
-    this.httpService.get('http://localhost:5002/restaurants').subscribe({
-      next: (response) =>
-        this.logger.log('Request to localhost server succeeded.'),
-      error: (error) =>
-        this.logger.error(`Request to localhost server failed: ${error}`),
-    })
+
+    try {
+      await this.getRestaurantData()
+      this.logger.log('Data updated successfully')
+    } catch (error) {
+      this.logger.error(`Failed to update data : ${error}`)
+    }
   }
 
   async getRestaurantData() {
@@ -60,21 +62,24 @@ export class ScheduleService {
         collectedData = collectedData
           .filter(
             (data) =>
-              data.BSN_STATE_NM !== '폐업' &&
               data.REFINE_ROADNM_ADDR !== null &&
               data.REFINE_WGS84_LAT !== null &&
               data.REFINE_WGS84_LOGT !== null,
           )
           .map((data) => {
             return {
-              nameAddress: `${data.BIZPLC_NM}${data.REFINE_ROADNM_ADDR.replace(
-                /\s/g,
-                '',
-              )}`, // nameAddress 필드에 BIZPLC_NM 값과 띄어쓰기를 제거한 REFINE_ROADNM_ADDR 값을 조합하여 할당
+              nameAddress:
+                `${data.BIZPLC_NM}${data.REFINE_ROADNM_ADDR}${data.SANITTN_BIZCOND_NM}`.replace(
+                  /\s/g,
+                  '',
+                ), // nameAddress 필드에 BIZPLC_NM 값과 띄어쓰기를 제거한 REFINE_ROADNM_ADDR 값을 조합하여 할당
               countyName: data.SIGUN_NM, // countyName 필드에 SIGUN_NM 값을 할당
               name: data.BIZPLC_NM, // name 필드에 BIZPLC_NM 값을 할당
               type: data.SANITTN_BIZCOND_NM, // type 필드에 SANITTN_BIZCOND_NM 값을 할당
               address: data.REFINE_ROADNM_ADDR, // address 필드에 REFINE_ROADNM_ADDR 값을 할당
+              status: data.BSN_STATE_NM
+                ? data.BSN_STATE_NM
+                : statusEnum.unconfirmed,
               lat: data.REFINE_WGS84_LAT, // lat 필드에 REFINE_WGS84_LAT 값을 할당
               lon: data.REFINE_WGS84_LOGT, // lon 필드에 REFINE_WGS84_LOGT 값을 할당
               score: 0, // score 필드에 초기 점수를 할당
@@ -86,7 +91,12 @@ export class ScheduleService {
         ).map((nameAddress) => {
           return collectedData.find((item) => item.nameAddress === nameAddress)
         })
-        await this.restaurantRepository.upsert(uniqueData, ['nameAddress'])
+
+        const chunkSize = 1000 // PostgreSQL의 한계를 고려하여 적절하게 조정해야 합니다.
+        for (let i = 0; i < uniqueData.length; i += chunkSize) {
+          const chunk = uniqueData.slice(i, i + chunkSize)
+          await this.restaurantRepository.upsert(chunk, ['nameAddress'])
+        }
       }
     } catch (error) {
       console.error(error)
