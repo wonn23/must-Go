@@ -2,7 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common'
 import { PlaceService } from './place.service'
 import { ScheduleService } from './schedule.service'
 
-@Controller('place')
+@Controller('places')
 export class PlaceController {
   constructor(
     private readonly placeService: PlaceService,
