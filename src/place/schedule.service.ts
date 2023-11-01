@@ -1,16 +1,30 @@
-import { Injectable } from '@nestjs/common/decorators'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { HttpService } from '@nestjs/axios'
 import { lastValueFrom } from 'rxjs'
 import { RestaurantRepository } from './restaurant.repository'
+import { Cron } from '@nestjs/schedule'
 
 @Injectable()
 export class ScheduleService {
+  private readonly logger = new Logger(ScheduleService.name)
+
   constructor(
     private configService: ConfigService,
     private httpService: HttpService,
     private restaurantRepository: RestaurantRepository,
   ) {}
+
+  @Cron('0 1 * * 5')
+  sendRequest() {
+    this.logger.debug('Called every Friday at 1 AM')
+    this.httpService.get('http://localhost:5002/restaurants').subscribe({
+      next: (response) =>
+        this.logger.log('Request to localhost server succeeded.'),
+      error: (error) =>
+        this.logger.error(`Request to localhost server failed: ${error}`),
+    })
+  }
 
   async getRestaurantData() {
     try {

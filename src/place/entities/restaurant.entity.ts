@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 
 @Entity()
@@ -37,6 +38,8 @@ export class Restaurant extends BaseEntity {
   @Column()
   score: number
 
+  @UpdateDateColumn({ nullable: false })
+  updatedAt: Date
   // @ManyToOne(() => Rating, (rating) => restaurants)
   // rating: Rating
 }
