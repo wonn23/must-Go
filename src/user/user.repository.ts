@@ -2,6 +2,7 @@ import { Repository } from 'typeorm'
 import { CustomRepository } from '../common/decorator/typeorm-ex.decorator'
 import { User } from './entities/user.entity'
 import { RegisterUserDto } from './dto/registerUser.dto'
+import { SettingUserDto } from './dto/settingUser.dto'
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
@@ -37,5 +38,18 @@ export class UserRepository extends Repository<User> {
     })
 
     return user
+  }
+
+  // 설정 업데이트
+  async updateUserByUsername(username: string, settingUserDto: SettingUserDto): Promise<boolean> {
+    const user = await this.createQueryBuilder()
+    .update(User)
+    .set({
+      ...settingUserDto
+    })
+    .where({ username })
+    .execute()
+
+    return user.affected === 1 ? true : false
   }
 }
