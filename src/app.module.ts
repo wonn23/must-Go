@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { typeORMConfig } from './config/typeorm.config'
 import { AuthModule } from './auth/auth.module'
 import { UserModule } from './user/user.module'
-import { RestaurantModule } from './place/restaurant.module'
+import { RestaurantModule } from './restaurant/restaurant.module'
 import scheduleConfig from './config/schedule.config'
 import { ScheduleModule } from '@nestjs/schedule'
 @Module({
