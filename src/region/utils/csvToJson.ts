@@ -22,7 +22,7 @@ export function csvToJSON(csv_string) {
     obj['id'] = i
     // 각 내용행을 {제목1:내용1, 제목2:내용2, ...} 형태의 객체로 생성
     for (let j = 0; j < header.length; j++) {
-      obj[header[j].trim()] = row[j].trim()
+      obj[header[j].trim()] = j > 1 ? sliceString(row[j].trim()) : row[j].trim()
     }
 
     // 각 내용 행의 객체를 jsonArray배열에 담기
@@ -34,4 +34,11 @@ export function csvToJSON(csv_string) {
 
   // 문자열 형태의 JSON으로 반환할 경우, 아래 코드 사용
   // return JSON.stringify(jsonArray);
+}
+
+// 소수점 두자리까지
+function sliceString(str): string {
+  const dotInex: number = str.indexOf('.')
+  if (dotInex !== -1) return str.slice(0, dotInex + 3)
+  else return str
 }
