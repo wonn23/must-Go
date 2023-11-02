@@ -14,7 +14,7 @@ export const typeORMConfig = async (
     database: configService.get<string>('DB_DATABASE') || 'postgres',
     entities: [__dirname + '/../**/*.entity.{js,ts}'],
     synchronize: configService.get<string>('DB_SYNCHRONIZE') === 'true',
-    dropSchema: true,
+    // dropSchema: true,
     namingStrategy: new SnakeNamingStrategy(),
     // logging: true,
   }
