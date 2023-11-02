@@ -33,10 +33,7 @@ export class AuthService {
       if (!isAuth) throw new UnauthorizedException('비밀번호가 틀렸습니다.')
 
       const payload = { username: user.username }
-      const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: Number(this.configService.get<string>('JWT_EXPORESIN')),
-      })
+      const accessToken = this.jwtService.sign(payload)
 
       return { accessToken }
     } catch (error) {
