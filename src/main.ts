@@ -15,7 +15,7 @@ async function bootstrap() {
           level: process.env.NODE_ENV === 'production' ? 'info' : 'silly', // prod에선 info 이하 로그레벨 출력, dev에선 silly이하 로그레벨 출력
           format: winston.format.combine(
             winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // 날짜 형식
-            winston.format.prettyPrint({ colorize: true }),
+            winston.format.prettyPrint({ colorize: true })
             winston.format.label({ label: 'must-Go' }), // 프로젝트 명
             winston.format.printf(({ level, message, label, timestamp }) => {
               let logColor
