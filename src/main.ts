@@ -16,7 +16,7 @@ async function bootstrap() {
           format: winston.format.combine(
             winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // 날짜 형식
             winston.format.prettyPrint({ colorize: true }),
-            winston.format.label({ label: 'foodfood' }), // 프로젝트 명
+            winston.format.label({ label: 'must-Go' }), // 프로젝트 명
             winston.format.printf(({ level, message, label, timestamp }) => {
               let logColor
               /*
@@ -32,6 +32,8 @@ async function bootstrap() {
                   break
                 case 'warn':
                   logColor = '\x1b[33m' // 노란색
+                case 'info':
+                  logColor = '\x1b[32m' // 초록색
                   break
                 default:
                   logColor = '\x1b[37m' // 흰색
@@ -49,7 +51,7 @@ async function bootstrap() {
           format: winston.format.combine(
             winston.format.errors({ stack: true }),
             winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            winston.format.label({ label: 'foodfood' }), // 프로젝트 이름
+            winston.format.label({ label: 'must-Go' }), // 프로젝트 이름
             winston.format.printf(({ level, message, label, timestamp }) => {
               let logColor
               switch (level) {
@@ -61,13 +63,17 @@ async function bootstrap() {
                   break
                 case 'warn':
                   logColor = '\x1b[33m' // 노란색
+                case 'info':
+                  logColor = '\x1b[32m' // 초록색
                   break
                 default:
-                  logColor = '\x1b[37m' // 흰색
+                  logColor = '\x1b[0m' // 기본 색상 (흰색)
                   break
               }
               return `[${label}] ${logColor}${timestamp} [${level.toUpperCase()}] - ${message}\x1b[0m`
             }),
+
+            winston.format.json(), // 에러는 json형식으로 저장한다.
           ),
         }),
         new winston.transports.File({
