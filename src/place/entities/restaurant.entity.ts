@@ -1,3 +1,4 @@
+import { Rating } from 'src/rating/entities/rating.entity'
 import {
   BaseEntity,
   Column,
@@ -37,6 +38,6 @@ export class Restaurant extends BaseEntity {
   @Column()
   score: number
 
-  // @ManyToOne(() => Rating, (rating) => restaurants)
-  // rating: Rating
+  @ManyToOne(() => Rating, (rating) => rating.restaurant)
+  ratings: Rating[]
 }

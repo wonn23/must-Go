@@ -15,7 +15,7 @@ export class ScheduleService {
   async getRestaurantData() {
     try {
       const key = await this.configService.get<string>('schedule.apiKey')
-      const foodList = ['jpnfood', 'chifood', 'lunch']
+      const foodList = ['chifood', 'lunch']
       const pIndex = 1
       const pSize = 1000
       let GenrestrtFood = ''
@@ -42,6 +42,7 @@ export class ScheduleService {
           collectedData = collectedData.concat(
             nextPageResponse.data[GenrestrtFood][1].row,
           )
+          console.log(index, food)
         }
         collectedData = collectedData
           .filter(
@@ -66,14 +67,17 @@ export class ScheduleService {
               score: 0, // score 필드에 초기 점수를 할당
             }
           })
+        // collectedData는 정제가 다 끝난 데이터 하지만 중복이 있다.
 
         uniqueData = Array.from(
           new Set(collectedData.map((item) => item.nameAddress)),
         ).map((nameAddress) => {
           return collectedData.find((item) => item.nameAddress === nameAddress)
         })
-        await this.restaurantRepository.upsert(uniqueData, ['nameAddress'])
+
+        await this.restaurantRepository.save(collectedData)
       }
+      // return uniqueData
     } catch (error) {
       console.error(error)
     }
