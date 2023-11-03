@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsIn } from 'class-validator'
+import { IsOptional, IsString, IsIn } from 'class-validator'
 
 export class getRestaurantDto {
   @IsOptional()
@@ -12,4 +12,8 @@ export class getRestaurantDto {
   @IsString()
   @IsIn(['Distance', 'Rating'])
   orderBy: string
+
+  @IsOptional()
+  @IsString()
+  filter: string
 }
