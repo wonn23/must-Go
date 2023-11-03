@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
-import { getRestaurantDto } from './dto/get-restaurant.dto'
+import { GetRestaurantDto } from './dto/get-restaurant.dto'
 // import { CreateRestaurantDto } from './dto/create-restaurant.dto'
 // import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
 
@@ -14,7 +14,7 @@ export class RestaurantService {
   //   return 'This action adds a new restaurant'
   // }
 
-  async getRestaurantsInRange(query: getRestaurantDto): Promise<object> {
+  async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
