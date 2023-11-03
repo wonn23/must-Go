@@ -22,7 +22,8 @@ export function csvToJSON(csv_string) {
     obj['id'] = i
     // 각 내용행을 {제목1:내용1, 제목2:내용2, ...} 형태의 객체로 생성
     for (let j = 0; j < header.length; j++) {
-      obj[header[j].trim()] = j > 1 ? sliceString(row[j].trim()) : row[j].trim()
+      //obj[header[j].trim()] = j > 1 ? sliceString(row[j].trim()) : row[j].trim() //소수점 2째까지
+      obj[header[j].trim()] = row[j].trim()
     }
 
     // 각 내용 행의 객체를 jsonArray배열에 담기
