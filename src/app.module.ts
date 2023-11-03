@@ -8,7 +8,7 @@ import { RestaurantModule } from './restaurant/restaurant.module'
 import scheduleConfig from './config/schedule.config'
 import { ScheduleModule } from '@nestjs/schedule'
 import { ReviewModule } from './review/review.module'
-import { RegionModule } from './region/region.module';
+import { RegionModule } from './region/region.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +31,8 @@ import { RegionModule } from './region/region.module';
     AuthModule,
     UserModule,
     RestaurantModule,
+    ReviewModule,
+    RegionModule,
   ],
 })
 export class AppModule {}
