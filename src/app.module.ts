@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module'
 import { RestaurantModule } from './restaurant/restaurant.module'
 import scheduleConfig from './config/schedule.config'
 import { ScheduleModule } from '@nestjs/schedule'
+import { ReviewModule } from './review/review.module'
 import { RegionModule } from './region/region.module';
 @Module({
   imports: [
@@ -30,7 +31,6 @@ import { RegionModule } from './region/region.module';
     AuthModule,
     UserModule,
     RestaurantModule,
-    RegionModule,
   ],
 })
 export class AppModule {}

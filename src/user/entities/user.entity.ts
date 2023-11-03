@@ -1,7 +1,9 @@
+import { Review } from 'src/review/entities/review.entity'
 import {
   BaseEntity,
   Column,
   Entity,
+  OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   Unique,
@@ -27,4 +29,7 @@ export class User extends BaseEntity {
 
   @Column({ nullable: false, type: 'boolean', default: false })
   lunchServiceYn: boolean
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[]
 }

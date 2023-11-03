@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common'
@@ -8,6 +10,7 @@ import { UserRepository } from './user.repository'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { User } from './entities/user.entity'
 import * as bcrypt from 'bcryptjs'
+import { SettingUserDto } from './dto/settingUser.dto'
 
 @Injectable()
 export class UserService {
@@ -42,5 +45,15 @@ export class UserService {
 
   async getUserInfo(userName: string): Promise<User> {
     return this.userRepository.findByUsernameExceptPW(userName)
+  }
+
+  async updateSetting(username: string, settingUserDto: SettingUserDto): Promise<object> {
+    const updatedRow = await this.userRepository.updateUserByUsername(username, settingUserDto)
+
+    if (updatedRow) {
+      return { message: '회원 정보를 수정했습니다.' } 
+    } else {
+      throw new HttpException({ message: '다시 시도해주세요.' }, HttpStatus.BAD_REQUEST)
+    }
   }
 }

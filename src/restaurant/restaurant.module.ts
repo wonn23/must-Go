@@ -7,10 +7,12 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Restaurant } from './entities/restaurant.entity'
 import { TypeOrmExModule } from 'src/common/decorator/typeoprm-ex.module'
 import { RestaurantRepository } from './restaurant.repository'
+import { PassportModule } from '@nestjs/passport'
 
 @Module({
   imports: [
     HttpModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forFeature([Restaurant]),
     TypeOrmExModule.forCustomRepository([RestaurantRepository]),
   ],
