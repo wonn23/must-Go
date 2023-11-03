@@ -1,8 +1,9 @@
+import { Review } from 'src/review/entities/review.entity'
 import {
   BaseEntity,
   Column,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
@@ -39,11 +40,12 @@ export class Restaurant extends BaseEntity {
   @Column()
   lon: string
 
-  @Column()
+  @Column({ type: 'double precision' })
   score: number
 
-  @UpdateDateColumn({ nullable: false })
+  @UpdateDateColumn()
   updatedAt: Date
-  // @ManyToOne(() => Rating, (rating) => restaurants)
-  // rating: Rating
+
+  @OneToMany(() => Review, (review) => review.restaurant)
+  reviews: Review[]
 }

@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module'
 import { RestaurantModule } from './restaurant/restaurant.module'
 import scheduleConfig from './config/schedule.config'
 import { ScheduleModule } from '@nestjs/schedule'
+import { ReviewModule } from './review/review.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +30,7 @@ import { ScheduleModule } from '@nestjs/schedule'
     AuthModule,
     UserModule,
     RestaurantModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}
