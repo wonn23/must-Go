@@ -24,6 +24,7 @@ export class RestaurantController {
     type: RestaurantDto,
   })
   @Get()
+  @UseGuards(AuthGuard())
   @UsePipes(new RestaurantValidationPipe())
   async getRestaurantsInRange(@Query() query: GetRestaurantDto) {
     return await this.restaurantService.getRestaurantsInRange(query)
