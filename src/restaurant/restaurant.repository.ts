@@ -4,7 +4,7 @@ import { Restaurant } from './entities/restaurant.entity'
 import { statusEnum } from './types/restaurant.enum'
 @CustomRepository(Restaurant)
 export class RestaurantRepository extends Repository<Restaurant> {
-  async findAll(query): Promise<Restaurant[]> {
+  async getRestaurantsInRange(query): Promise<Restaurant[]> {
     const { lat, lon, range, filter } = query
 
     // 위도와 경도에 범위를 더하거나 뺀 값으로 사각형의 네 꼭짓점 구하기

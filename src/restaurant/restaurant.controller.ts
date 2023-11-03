@@ -16,8 +16,8 @@ export class RestaurantController {
 
   @Get()
   @UsePipes(new RestaurantValidationPipe())
-  async getAllRestaurants(@Query() query: getRestaurantDto) {
-    return await this.restaurantService.getAllRestaurants(query)
+  async getRestaurantsInRange(@Query() query: getRestaurantDto) {
+    return await this.restaurantService.getRestaurantsInRange(query)
   }
 
   // @Get(':id')

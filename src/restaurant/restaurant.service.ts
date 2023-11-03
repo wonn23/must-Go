@@ -14,9 +14,10 @@ export class RestaurantService {
   //   return 'This action adds a new restaurant'
   // }
 
-  async getAllRestaurants(query: getRestaurantDto): Promise<object> {
+  async getRestaurantsInRange(query: getRestaurantDto): Promise<object> {
     try {
-      const restaurants = await this.restaurantRepository.findAll(query)
+      const restaurants =
+        await this.restaurantRepository.getRestaurantsInRange(query)
       const { lat, lon, range, orderBy } = query
       const point1 = [lon, lat] // 쿼리로 받아온 위치
       const filteredRestaurants = []
