@@ -2,7 +2,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common'
 import { ReviewRepository } from '../review/review.repository'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -77,14 +76,18 @@ export class ReviewService {
       await queryRunner.manager.save(Review, review)
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
+      await queryRunner.manager.update(Restaurant, restaurant.id, {
+        score: restaurant.score,
+      })
 
       return review
     } catch (error) {
       await queryRunner.rollbackTransaction()
       throw new InternalServerErrorException('리뷰 작성에 실패했습니다.')
     } finally {
-      await queryRunner.release()
+      if (!Error) {
+        await queryRunner.release()
+      }
     }
   }
 
@@ -122,14 +125,23 @@ export class ReviewService {
 
       review.score = reviewDto.score
       review.content = reviewDto.content
-      await queryRunner.manager.update(Review, review.id, review)
+      await queryRunner.manager.update(Review, review.id, {
+        score: reviewDto.score,
+        content: reviewDto.content,
+      })
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      await queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
+      await queryRunner.manager.update(Restaurant, restaurant.id, {
+        score: restaurant.score,
+      })
 
       return review
     } catch (error) {
       throw new InternalServerErrorException('리뷰를 수정하는데 실패했습니다.')
+    } finally {
+      if (!Error) {
+        await queryRunner.release()
+      }
     }
   }
 
@@ -167,24 +179,34 @@ export class ReviewService {
       await queryRunner.manager.softDelete(Review, review.id)
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      await queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
+      await queryRunner.manager.update(Restaurant, restaurant.id, {
+        score: restaurant.score,
+      })
     } catch (error) {
       throw new InternalServerErrorException('리뷰를 삭제하는데 실패했습니다.')
+    } finally {
+      if (!Error) {
+        await queryRunner.release()
+      }
     }
   }
 
   async calculateAverageScore(restaurantId: number) {
-    const [reviewsOfRestaurant, totalCount] =
-      await this.reviewRepository.findAndCount({
-        where: { restaurant: { id: restaurantId } },
-      })
+    try {
+      const [reviewsOfRestaurant, totalCount] =
+        await this.reviewRepository.findAndCount({
+          where: { restaurant: { id: restaurantId } },
+        })
 
-    const sumScore = reviewsOfRestaurant.reduce(
-      (sum, review) => sum + review.score,
-      0,
-    )
+      const sumScore = reviewsOfRestaurant.reduce(
+        (sum, review) => sum + review.score,
+        0,
+      )
 
-    const averageScore = Math.round((sumScore / totalCount) * 10) / 10
-    return averageScore
+      const averageScore = Math.round((sumScore / totalCount) * 10) / 10
+      return averageScore
+    } catch (error) {
+      throw new InternalServerErrorException('평균 점수 계산에 실패했습니다.')
+    }
   }
 }
