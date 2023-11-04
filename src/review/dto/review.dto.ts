@@ -5,7 +5,7 @@ export class ReviewDto {
   @IsInt({ message: '별점은 정수입니다.' })
   @Min(0, { message: '스코어는 0 이상이어야 합니다.' })
   @Max(5, { message: '스코어는 5 이하여야 합니다.' })
-  @ApiProperty({ description: '리뷰 점' })
+  @ApiProperty({ description: '리뷰 점수' })
   score: number
 
   @IsString()
