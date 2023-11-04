@@ -11,7 +11,8 @@ import { Review } from './entities/review.entity'
 import { RestaurantRepository } from 'src/restaurant/restaurant.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UserRepository } from 'src/user/user.repository'
-import { LessThanOrEqual } from 'typeorm'
+import { DataSource } from 'typeorm'
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity'
 
 @Injectable()
 export class ReviewService {
@@ -22,11 +23,12 @@ export class ReviewService {
     private reviewRepository: ReviewRepository,
     @InjectRepository(RestaurantRepository)
     private restaurantRepository: RestaurantRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getAllReviews(): Promise<Review[]> {
     try {
-      return this.reviewRepository.find()
+      return this.reviewRepository.getAllReviews()
     } catch (error) {
       throw new InternalServerErrorException(
         '리뷰 목록을 불러오는데 실패했습니다.',
@@ -49,15 +51,19 @@ export class ReviewService {
     reviewDto: ReviewDto,
     user: User,
   ): Promise<object> {
+    const queryRunner = this.dataSource.createQueryRunner()
+
+    await queryRunner.connect()
+    await queryRunner.startTransaction('READ COMMITTED')
     try {
-      const reviewer = await this.userRepository.findOne({
+      const reviewer = await queryRunner.manager.findOne(User, {
         where: { id: user.id },
       })
       if (!reviewer) {
         throw new NotFoundException('유저를 찾을 수 없습니다.')
       }
 
-      const restaurant = await this.restaurantRepository.findOne({
+      const restaurant = await queryRunner.manager.findOne(Restaurant, {
         where: { id: restaurantId },
       })
       if (!restaurant) {
@@ -68,10 +74,17 @@ export class ReviewService {
       review.score = reviewDto.score
       review.content = reviewDto.content
       review.restaurant = restaurant
+      await queryRunner.manager.save(Review, review)
 
-      return this.reviewRepository.save(review)
+      restaurant.score = await this.calculateAverageScore(restaurantId)
+      queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
+
+      return review
     } catch (error) {
+      await queryRunner.rollbackTransaction()
       throw new InternalServerErrorException('리뷰 작성에 실패했습니다.')
+    } finally {
+      await queryRunner.release()
     }
   }
 
@@ -81,22 +94,26 @@ export class ReviewService {
     reviewDto: ReviewDto,
     user: User,
   ): Promise<Review> {
+    const queryRunner = this.dataSource.createQueryRunner()
+
+    await queryRunner.connect()
+    await queryRunner.startTransaction('READ COMMITTED')
     try {
-      const reviewer = await this.userRepository.findOne({
+      const reviewer = await queryRunner.manager.findOne(User, {
         where: { id: user.id },
       })
       if (!reviewer) {
         throw new NotFoundException('유저를 찾을 수 없습니다.')
       }
 
-      const restaurant = await this.restaurantRepository.findOne({
+      const restaurant = await queryRunner.manager.findOne(Restaurant, {
         where: { id: restaurantId },
       })
       if (!restaurant) {
         throw new NotFoundException('해당하는 맛집을 찾을 수 없습니다.')
       }
 
-      const review = await this.reviewRepository.findOne({
+      const review = await queryRunner.manager.findOne(Review, {
         where: { id: reviewId },
       })
       if (!review) {
@@ -105,8 +122,11 @@ export class ReviewService {
 
       review.score = reviewDto.score
       review.content = reviewDto.content
+      await queryRunner.manager.update(Review, review.id, review)
 
-      await this.reviewRepository.update(review.id, review)
+      restaurant.score = await this.calculateAverageScore(restaurantId)
+      await queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
+
       return review
     } catch (error) {
       throw new InternalServerErrorException('리뷰를 수정하는데 실패했습니다.')
@@ -118,41 +138,53 @@ export class ReviewService {
     reviewId: number,
     user: User,
   ): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner()
+
+    await queryRunner.connect()
+    await queryRunner.startTransaction('READ COMMITTED')
     try {
-      const reviewer = await this.userRepository.findOne({
+      const reviewer = await queryRunner.manager.findOne(User, {
         where: { id: user.id },
       })
       if (!reviewer) {
         throw new NotFoundException('유저를 찾을 수 없습니다.')
       }
 
-      const restaurant = await this.restaurantRepository.findOne({
+      const restaurant = await queryRunner.manager.findOne(Restaurant, {
         where: { id: restaurantId },
       })
       if (!restaurant) {
         throw new NotFoundException('해당하는 맛집을 찾을 수 없습니다.')
       }
 
-      const review = await this.reviewRepository.findOne({
+      const review = await queryRunner.manager.findOne(Review, {
         where: { id: reviewId },
       })
       if (!review) {
         throw new NotFoundException('해당 맛집의 리뷰를 찾을 수 없습니다.')
       }
 
-      await this.reviewRepository.softDelete(review.id)
+      await queryRunner.manager.softDelete(Review, review.id)
+
+      restaurant.score = await this.calculateAverageScore(restaurantId)
+      await queryRunner.manager.update(Restaurant, restaurant.id, restaurant)
     } catch (error) {
       throw new InternalServerErrorException('리뷰를 삭제하는데 실패했습니다.')
     }
   }
 
-  // async averageScore() {
-  //   const [scores, totalCount] = await this.reviewRepository.findAndCount({
-  //     where: {
-  //       score: LessThanOrEqual(5),
-  //     },
-  //   })
+  async calculateAverageScore(restaurantId: number) {
+    const [reviewsOfRestaurant, totalCount] =
+      await this.reviewRepository.findAndCount({
+        where: { restaurant: { id: restaurantId } },
+      })
 
-  //   return { scores, totalCount } // 평점 평균은 -> 모든 평점의 합/평가한 사람수
-  // }
+    const sumScore = reviewsOfRestaurant.reduce(
+      (sum, review) => sum + review.score,
+      0,
+    )
+
+    const averageScore = Math.round((sumScore / totalCount) * 10) / 10
+    return averageScore
+  }
 }
