@@ -15,13 +15,17 @@ import { Review } from './entities/review.entity'
 import { GetUser } from 'src/auth/get-user.decorator'
 import { User } from 'src/user/entities/user.entity'
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
 
 @ApiTags('리뷰')
@@ -34,7 +38,7 @@ export class ReviewController {
     type: Review,
     description: '리뷰 목록 불러오기 성공했습니다.',
   })
-  @ApiResponse({ status: 500, description: 'InternalServerError.' })
+  @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
   @Get()
   async getAllReviews() {
     return this.reviewService.getAllReviews()
@@ -46,7 +50,8 @@ export class ReviewController {
     description: '리뷰 상세 불러오기 성공했습니다.',
   })
   @ApiParam({ name: 'id', description: '리뷰 ID' })
-  @ApiResponse({ status: 500, description: 'InternalServerError.' })
+  @ApiBadRequestResponse({ description: 'BadRequest' })
+  @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
   @Get(':id')
   async getReviewById(@Param('id') id: string) {
     return this.reviewService.getReviewById(+id)
@@ -54,11 +59,13 @@ export class ReviewController {
 
   @ApiOperation({ summary: '리뷰 생성' })
   @ApiBearerAuth()
-  @ApiBody({ type: ReviewDto, description: 'Review data' })
-  @ApiResponse({ status: 201, description: 'created' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'NotFounded.' })
-  @ApiResponse({ status: 500, description: 'InternalServerError.' })
+  @ApiParam({ name: 'restaurantId', description: '맛집 ID' })
+  @ApiBody({ type: ReviewDto, description: '리뷰 데이터' })
+  @ApiCreatedResponse({ description: 'created' })
+  @ApiBadRequestResponse({ description: 'BadRequest' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'NotFounded.' })
+  @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
   @Post()
   @UseGuards(AuthGuard())
   async createReview(
@@ -71,11 +78,17 @@ export class ReviewController {
 
   @ApiOperation({ summary: '리뷰 수정' })
   @ApiBearerAuth()
-  @ApiBody({ type: ReviewDto, description: 'Review data' })
-  @ApiResponse({ status: 200, description: 'success' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'NotFounded.' })
-  @ApiResponse({ status: 500, description: 'InternalServerError.' })
+  @ApiParam({ name: 'restaurantId', description: '맛집 ID' })
+  @ApiParam({ name: 'id', description: '리뷰 ID' })
+  @ApiBody({ type: ReviewDto, description: '리뷰 데이터' })
+  @ApiOkResponse({
+    type: Review,
+    description: 'success',
+  })
+  @ApiBadRequestResponse({ description: 'BadRequest' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'NotFounded.' })
+  @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
   @Patch(':id')
   @UseGuards(AuthGuard())
   async updateReview(
@@ -89,10 +102,13 @@ export class ReviewController {
 
   @ApiOperation({ summary: '리뷰 삭제' })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, description: 'success' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'NotFounded.' })
-  @ApiResponse({ status: 500, description: 'InternalServerError.' })
+  @ApiParam({ name: 'restaurantId', description: '맛집 ID' })
+  @ApiParam({ name: 'id', description: '리뷰 ID' })
+  @ApiOkResponse({ description: 'success' })
+  @ApiBadRequestResponse({ description: 'BadRequest' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'NotFounded.' })
+  @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
   @Delete(':id')
   @UseGuards(AuthGuard())
   async deleteReview(
