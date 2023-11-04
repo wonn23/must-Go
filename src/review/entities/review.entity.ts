@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -34,5 +35,6 @@ export class Review extends BaseEntity {
   @ManyToOne(() => User, (user) => user.reviews)
   user: User
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.reviews)
+  @JoinColumn({ name: 'restaurantId' }) // 외래 키 설정
   restaurant: Restaurant
 }
