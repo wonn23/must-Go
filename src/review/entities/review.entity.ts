@@ -34,6 +34,7 @@ export class Review extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.reviews)
   user: User
+  @JoinColumn({ name: 'userId' }) // 외래 키 설정
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.reviews)
   @JoinColumn({ name: 'restaurantId' }) // 외래 키 설정
   restaurant: Restaurant
