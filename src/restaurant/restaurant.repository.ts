@@ -27,4 +27,13 @@ export class RestaurantRepository extends Repository<Restaurant> {
     })
     return restaurants
   }
+
+  async findRestaurantById(id: number) {
+    const restaurant = await this.createQueryBuilder('restaurant')
+      .leftJoinAndSelect('restaurant.reviews', 'review')
+      .orderBy('review.createdAt', 'DESC')
+      .where('restaurant.id = :id', { id })
+      .getOne()
+    return restaurant
+  }
 }

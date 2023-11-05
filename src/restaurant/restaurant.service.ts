@@ -2,6 +2,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
 import { GetRestaurantDto } from './dto/get-restaurant.dto'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ReviewRepository } from 'src/review/review.repository'
+import { Restaurant } from './entities/restaurant.entity'
 // import { CreateRestaurantDto } from './dto/create-restaurant.dto'
 // import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
 
@@ -9,10 +12,10 @@ import { GetRestaurantDto } from './dto/get-restaurant.dto'
 export class RestaurantService {
   private readonly logger = new Logger(RestaurantService.name)
 
-  constructor(private restaurantRepository: RestaurantRepository) {}
-  // create(createRestaurantDto: CreateRestaurantDto) {
-  //   return 'This action adds a new restaurant'
-  // }
+  constructor(
+    @InjectRepository(RestaurantRepository)
+    private restaurantRepository: RestaurantRepository,
+  ) {}
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
     try {
@@ -76,15 +79,13 @@ export class RestaurantService {
     return R * c
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} restaurant`
-  // }
-
-  // update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
-  //   return `This action updates a #${id} restaurant`
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} restaurant`
-  // }
+  async getRestaurantById(id: number) {
+    try {
+      return await this.restaurantRepository.findRestaurantById(id)
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '해당 리뷰를 불러오는데 실패했습니다.',
+      )
+    }
+  }
 }
