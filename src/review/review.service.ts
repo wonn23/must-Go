@@ -73,21 +73,18 @@ export class ReviewService {
       review.score = reviewDto.score
       review.content = reviewDto.content
       review.restaurant = restaurant
-      await queryRunner.manager.save(Review, review)
+      review.user = reviewer
+      await this.reviewRepository.save(review)
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      await queryRunner.manager.update(Restaurant, restaurant.id, {
-        score: restaurant.score,
-      })
+      await this.restaurantRepository.save(restaurant)
 
       return review
     } catch (error) {
       await queryRunner.rollbackTransaction()
       throw new InternalServerErrorException('리뷰 작성에 실패했습니다.')
     } finally {
-      if (!Error) {
-        await queryRunner.release()
-      }
+      await queryRunner.release()
     }
   }
 
@@ -125,15 +122,10 @@ export class ReviewService {
 
       review.score = reviewDto.score
       review.content = reviewDto.content
-      await queryRunner.manager.update(Review, review.id, {
-        score: reviewDto.score,
-        content: reviewDto.content,
-      })
+      await this.reviewRepository.update(review.id, review)
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      await queryRunner.manager.update(Restaurant, restaurant.id, {
-        score: restaurant.score,
-      })
+      await this.restaurantRepository.update(restaurant.id, restaurant)
 
       return review
     } catch (error) {
@@ -176,12 +168,10 @@ export class ReviewService {
         throw new NotFoundException('해당 맛집의 리뷰를 찾을 수 없습니다.')
       }
 
-      await queryRunner.manager.softDelete(Review, review.id)
+      await this.reviewRepository.softDelete(review.id)
 
       restaurant.score = await this.calculateAverageScore(restaurantId)
-      await queryRunner.manager.update(Restaurant, restaurant.id, {
-        score: restaurant.score,
-      })
+      await this.restaurantRepository.update(restaurant.id, restaurant)
     } catch (error) {
       throw new InternalServerErrorException('리뷰를 삭제하는데 실패했습니다.')
     } finally {
