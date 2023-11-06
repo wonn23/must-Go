@@ -2,19 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
 import { GetRestaurantDto } from './dto/get-restaurant.dto'
-// import { CreateRestaurantDto } from './dto/create-restaurant.dto'
-// import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
 
 @Injectable()
 export class RestaurantService {
   private readonly logger = new Logger(RestaurantService.name)
 
   constructor(private restaurantRepository: RestaurantRepository) {}
-  // create(createRestaurantDto: CreateRestaurantDto) {
-  //   return 'This action adds a new restaurant'
-  // }
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
+    // range 내 식당과 거리 정보를 반환하는 함수.
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
@@ -53,6 +49,7 @@ export class RestaurantService {
   }
 
   private latLonToKm(point1: number[], point2: number[]): number {
+    // point 간 거리를 계산하는 함수.
     const lat1 = point1[1]
     const lon1 = point1[0]
     const lat2 = point2[1]
@@ -75,16 +72,4 @@ export class RestaurantService {
 
     return R * c
   }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} restaurant`
-  // }
-
-  // update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
-  //   return `This action updates a #${id} restaurant`
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} restaurant`
-  // }
 }
