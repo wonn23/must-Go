@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
-import { getRestaurantDto } from './dto/get-restaurant.dto'
+import { GetRestaurantDto } from './dto/get-restaurant.dto'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ReviewRepository } from 'src/review/review.repository'
+import { Restaurant } from './entities/restaurant.entity'
 // import { CreateRestaurantDto } from './dto/create-restaurant.dto'
 // import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
 
@@ -9,26 +12,25 @@ import { getRestaurantDto } from './dto/get-restaurant.dto'
 export class RestaurantService {
   private readonly logger = new Logger(RestaurantService.name)
 
-  constructor(private restaurantRepository: RestaurantRepository) {}
-  // create(createRestaurantDto: CreateRestaurantDto) {
-  //   return 'This action adds a new restaurant'
-  // }
+  constructor(
+    @InjectRepository(RestaurantRepository)
+    private restaurantRepository: RestaurantRepository,
+  ) {}
 
-  async getAllRestaurants(query: getRestaurantDto): Promise<object> {
+  async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
     try {
-      const restaurants = await this.restaurantRepository.findAll(query)
+      const restaurants =
+        await this.restaurantRepository.getRestaurantsInRange(query)
       const { lat, lon, range, orderBy } = query
       const point1 = [lon, lat] // 쿼리로 받아온 위치
       const filteredRestaurants = []
-      console.log(restaurants.length)
 
       for (let restaurant of restaurants) {
-        let lat2 = restaurant.lat
-        let lon2 = restaurant.lon
+        let lat2 = Number(restaurant.lat)
+        let lon2 = Number(restaurant.lon)
         let point2 = [lon2, lat2] // 식당의 위치
         const distance = this.latLonToKm(point1, point2)
         if (distance <= range) {
-          // console.log(restaurant.name, distance)
           const restaurantWithDistance = { ...restaurant, distance }
           filteredRestaurants.push(restaurantWithDistance)
         }
@@ -40,18 +42,20 @@ export class RestaurantService {
         filteredRestaurants.sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬
       }
 
-      console.log(filteredRestaurants.length)
       return filteredRestaurants
     } catch (error) {
-      console.log(error)
+      this.logger.error(`${error}`)
+      throw new InternalServerErrorException(
+        '맛집 목록을 가져오는 데 실패했습니다.',
+      )
     }
   }
 
-  private toRadians(degrees) {
+  private toRadians(degrees: number): number {
     return degrees * (Math.PI / 180)
   }
 
-  private latLonToKm(point1, point2) {
+  private latLonToKm(point1: number[], point2: number[]): number {
     const lat1 = point1[1]
     const lon1 = point1[0]
     const lat2 = point2[1]
@@ -75,15 +79,13 @@ export class RestaurantService {
     return R * c
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} restaurant`
-  // }
-
-  // update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
-  //   return `This action updates a #${id} restaurant`
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} restaurant`
-  // }
+  async getRestaurantById(id: number) {
+    try {
+      return await this.restaurantRepository.findRestaurantById(id)
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '해당 리뷰를 불러오는데 실패했습니다.',
+      )
+    }
+  }
 }
