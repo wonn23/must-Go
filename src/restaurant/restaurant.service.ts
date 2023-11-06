@@ -18,6 +18,7 @@ export class RestaurantService {
   ) {}
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
+    // range 내 식당과 거리 정보를 반환하는 함수.
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
@@ -56,6 +57,7 @@ export class RestaurantService {
   }
 
   private latLonToKm(point1: number[], point2: number[]): number {
+    // point 간 거리를 계산하는 함수.
     const lat1 = point1[1]
     const lon1 = point1[0]
     const lat2 = point2[1]
