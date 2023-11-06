@@ -11,6 +11,7 @@ export class RegionService {
     this.loadCsvDate()
   }
 
+  // TO-DO 이 부분에 캐싱 적용
   getKoreaRegion(dosi?: string, sgg?: string): object[] {
     if (dosi === undefined && sgg === undefined) return this.koreaRegion
 

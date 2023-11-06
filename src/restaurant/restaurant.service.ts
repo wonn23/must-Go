@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
 import { GetRestaurantDto } from './dto/get-restaurant.dto'
@@ -7,6 +11,8 @@ import { ReviewRepository } from 'src/review/review.repository'
 import { Restaurant } from './entities/restaurant.entity'
 // import { CreateRestaurantDto } from './dto/create-restaurant.dto'
 // import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
+import { ICACHE_SERVICE } from 'src/common/provider.constant'
+import { CacheService } from 'src/cache/cache.service'
 
 @Injectable()
 export class RestaurantService {
@@ -15,6 +21,8 @@ export class RestaurantService {
   constructor(
     @InjectRepository(RestaurantRepository)
     private restaurantRepository: RestaurantRepository,
+    @Inject(ICACHE_SERVICE)
+    private readonly cacheService: CacheService,
   ) {}
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
@@ -80,8 +88,17 @@ export class RestaurantService {
   }
 
   async getRestaurantById(id: number) {
+    const cacheKey = `RestaurantId:${id}`
+    const restaurant = await this.cacheService.getFromCache(cacheKey)
+
+    if (restaurant) return { restaurant }
+
     try {
-      return await this.restaurantRepository.findRestaurantById(id)
+      const result = await this.restaurantRepository.findRestaurantById(id)
+
+      await this.cacheService.setCache(cacheKey, result, 3600) // Cache for 1 hour
+
+      return { result }
     } catch (error) {
       throw new InternalServerErrorException(
         '해당 리뷰를 불러오는데 실패했습니다.',
