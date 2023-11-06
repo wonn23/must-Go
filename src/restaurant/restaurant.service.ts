@@ -2,12 +2,20 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { RestaurantRepository } from './restaurant.repository'
 import { Logger } from '@nestjs/common'
 import { GetRestaurantDto } from './dto/get-restaurant.dto'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ReviewRepository } from 'src/review/review.repository'
+import { Restaurant } from './entities/restaurant.entity'
+// import { CreateRestaurantDto } from './dto/create-restaurant.dto'
+// import { UpdateRestaurantDto } from './dto/update-restaurant.dto'
 
 @Injectable()
 export class RestaurantService {
   private readonly logger = new Logger(RestaurantService.name)
 
-  constructor(private restaurantRepository: RestaurantRepository) {}
+  constructor(
+    @InjectRepository(RestaurantRepository)
+    private restaurantRepository: RestaurantRepository,
+  ) {}
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
     // range 내 식당과 거리 정보를 반환하는 함수.
@@ -71,5 +79,15 @@ export class RestaurantService {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
     return R * c
+  }
+
+  async getRestaurantById(id: number) {
+    try {
+      return await this.restaurantRepository.findRestaurantById(id)
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '해당 리뷰를 불러오는데 실패했습니다.',
+      )
+    }
   }
 }
