@@ -74,8 +74,6 @@ async function bootstrap() {
               }
               return `[${label}] ${logColor}${timestamp} [${level.toUpperCase()}] - ${message}\x1b[0m`
             }),
-
-            winston.format.json(), // 에러는 json형식으로 저장한다.
           ),
         }),
         new winston.transports.File({
@@ -99,11 +97,10 @@ async function bootstrap() {
   app.enableCors()
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('please insert project name')
-    .setDescription('The [project name] API description')
+    .setTitle('must-Go')
+    .setDescription('The must-Go API description')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('user')
     .build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup('swagger', app, document)
