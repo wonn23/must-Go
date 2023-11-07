@@ -22,25 +22,13 @@ export class RestaurantService {
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
-      const { lat, lon, range, orderBy } = query
-      const point1 = [lon, lat] // 쿼리로 받아온 위치
+      const { range } = query
       const filteredRestaurants = []
 
       for (let restaurant of restaurants) {
-        let lat2 = Number(restaurant.lat)
-        let lon2 = Number(restaurant.lon)
-        let point2 = [lon2, lat2] // 식당의 위치
-        const distance = this.latLonToKm(point1, point2)
-        if (distance <= range) {
-          const restaurantWithDistance = { ...restaurant, distance }
-          filteredRestaurants.push(restaurantWithDistance)
+        if (restaurant['distance'] <= range) {
+          filteredRestaurants.push(restaurant)
         }
-      }
-
-      if (orderBy === 'Rating') {
-        filteredRestaurants.sort((a, b) => b.score - a.score) // 평점 내림차순 정렬
-      } else if (orderBy === 'Distance') {
-        filteredRestaurants.sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬
       }
 
       return filteredRestaurants
