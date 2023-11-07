@@ -21,7 +21,7 @@ export class WebhookRepository extends BaseEntity {
       `user.discordUrl AS "discordUrl"`
     ])
     .where(`user.${serviceYn} = true`)
-    .andWhere('user.discordUrl IS NOT NULL')
+    .andWhere(`user.discordUrl != ''`)
     .getRawMany()
 
     return userList
