@@ -14,7 +14,8 @@ export class WebhookService {
     private httpService: HttpService
   ) {}
 
-  @Cron('*/5 * * * * *') // 오전 11시 30분마다 실행
+  // @Cron('*/5 * * * * *') // 테스트용
+  @Cron('0 30 11 * * *') // 오전 11시 30분마다 실행
   async SendLunchRecommendation() {
     this.logger.log('start discord lunch service')
 
