@@ -10,16 +10,18 @@ export class WebhookRepository extends BaseEntity {
   ) { super() }
 
 
-  async findServiceUser(serviceYn): Promise<Array<{ lat, lon }>> {
+  async findServiceUser(serviceYn): Promise<Array<{ lat, lon, discordUrl }>> {
     const userList = await this.manager.connection
     .getRepository(User)
     .createQueryBuilder('user')
     .select([
-      'user.id AS userId',
-      'user.lat AS lat',
-      'user.lon AS lon'
+      `user.id AS "userId"`,
+      `user.lat AS "lat"`,
+      `user.lon AS "lon"`,
+      `user.discordUrl AS "discordUrl"`
     ])
     .where(`user.${serviceYn} = true`)
+    .andWhere('user.discordUrl IS NOT NULL')
     .getRawMany()
 
     return userList

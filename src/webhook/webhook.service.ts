@@ -14,7 +14,7 @@ export class WebhookService {
     private httpService: HttpService
   ) {}
 
-  @Cron('0 30 11 * * *') // 오전 11시 30분마다 실행
+  @Cron('*/5 * * * * *') // 오전 11시 30분마다 실행
   async SendLunchRecommendation() {
     this.logger.log('start discord lunch service')
 
@@ -26,7 +26,7 @@ export class WebhookService {
     if (userList[0]) {
       for (let user of userList) {
         // 거리 계산
-        const { lat, lon } = user
+        const { lat, lon, discordUrl } = user
         const range = 0.5 // (km)
         const rangePoint = calculator.getMinMaxPointByRectangle(parseFloat(lat), parseFloat(lon), range)
 
@@ -48,8 +48,7 @@ export class WebhookService {
 
         // send message
         const message = payloads.LUNCH_REC(Object.values(msgData))
-        const discordUrl = process.env.DISCORD_URL // 유저마다 다른 url을 저장 중인 것으로 가정하고 테이블 수정되면 DB에서 뽑아온 정보로 변경
-  
+
         await this.httpService
           .post(discordUrl, message)
           .subscribe({
