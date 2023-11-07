@@ -1,7 +1,6 @@
-import { Between, Repository, getRepository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { CustomRepository } from '../common/decorator/typeorm-ex.decorator'
 import { Restaurant } from './entities/restaurant.entity'
-import { statusEnum } from './types/restaurant.enum'
 
 @CustomRepository(Restaurant)
 export class RestaurantRepository extends Repository<Restaurant> {
