@@ -40,7 +40,7 @@ export class RegionController {
   getKoreaRegion(
     @Query('dosi') dosi: string,
     @Query('sgg') sgg: string,
-  ): object[] {
+  ): Promise<object[]> {
     return this.regionService.getKoreaRegion(dosi, sgg)
   }
 }
