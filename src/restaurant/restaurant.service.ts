@@ -22,9 +22,12 @@ export class RestaurantService {
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
-      const { range } = query
+      const range = query.range
       const filteredRestaurants = []
 
+      /* Repository에서 반환된 맛집들 중 range(km)내의 맛집들만 배열에 담아줍니다.
+        처음에 사각형 범위로 필터링을 진행했기 때문에, 실제 지정된 범위를 벗어날 수 있습니다.
+        그래서 여기에서 한 번 더 필터링을 진행합니다.*/
       for (let restaurant of restaurants) {
         if (restaurant['distance'] <= range) {
           filteredRestaurants.push(restaurant)
@@ -38,35 +41,6 @@ export class RestaurantService {
         '맛집 목록을 가져오는 데 실패했습니다.',
       )
     }
-  }
-
-  private toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180)
-  }
-
-  private latLonToKm(point1: number[], point2: number[]): number {
-    // point 간 거리를 계산하는 함수.
-    const lat1 = point1[1]
-    const lon1 = point1[0]
-    const lat2 = point2[1]
-    const lon2 = point2[0]
-
-    const R = 6371 // km
-    const dLat = this.toRadians(lat2 - lat1)
-    const dLon = this.toRadians(lon2 - lon1)
-
-    const radLat1 = this.toRadians(lat1)
-    const radLat2 = this.toRadians(lat2)
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) *
-        Math.sin(dLon / 2) *
-        Math.cos(radLat1) *
-        Math.cos(radLat2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-    return R * c
   }
 
   async getRestaurantById(id: number) {

@@ -6,18 +6,34 @@ import { statusEnum } from './types/restaurant.enum'
 @CustomRepository(Restaurant)
 export class RestaurantRepository extends Repository<Restaurant> {
   async getRestaurantsInRange(query): Promise<object[]> {
+    /* 쿼리로 들어온 point(lat, lon)을 기준으로 range내의 맛집들을 조회하고,
+    orderBy를 기준으로 정렬, filter 기준으로 업태를 분류해서 return 하는 함수 */
+
     const { lat, lon, range, orderBy, filter } = query
-    const latRange: number = range * 0.009009 // 대략적으로 1km에 0.009009도
-    const lonRange: number = range * 0.011236 // 대략적으로 1km에 0.011236도
-    const minLat: number = lat - latRange
-    const maxLat: number = lat + latRange
-    const minLon: number = lon - lonRange
-    const maxLon: number = lon + lonRange
+    const latRange = this.convertRangeToDegree(range, true) // 대략적으로 1km에 0.009009도
+    const lonRange = this.convertRangeToDegree(range, false) // 대략적으로 1km에 0.011236도
+    const minLat = lat - latRange
+    const maxLat = lat + latRange
+    const minLon = lon - lonRange
+    const maxLon = lon + lonRange
 
     const queryBuilder = this.createQueryBuilder('restaurant')
       // 사각형 범위로 필터링
-      .where(`lat::float BETWEEN ${minLat} AND ${maxLat}`)
-      .andWhere(`lon::float BETWEEN ${minLon} AND ${maxLon}`)
+      .where(`restaurant.lat::float BETWEEN ${minLat} AND ${maxLat}`)
+      .andWhere(`restaurant.lon::float BETWEEN ${minLon} AND ${maxLon}`)
+      .select([
+        'restaurant.id as id',
+        'restaurant.name_address as name_address',
+        'restaurant.county_name as county_name',
+        'restaurant.name as name',
+        'restaurant.type as type',
+        'restaurant.address as address',
+        'restaurant.status as status',
+        'restaurant.lat as lat',
+        'restaurant.lon as lon',
+        'restaurant.score as score',
+        'restaurant.updated_at as updated_at',
+      ])
 
     // 유형에 따른 필터링
     if (filter) {
@@ -30,7 +46,7 @@ export class RestaurantRepository extends Repository<Restaurant> {
       'distance',
     )
 
-    // status가 '영업'인 식당만 필터링
+    // 영업 중인 식당 필터링
     queryBuilder.andWhere(`restaurant.status = '영업'`)
 
     // 정렬
@@ -52,5 +68,11 @@ export class RestaurantRepository extends Repository<Restaurant> {
       .where('restaurant.id = :id', { id })
       .getOne()
     return restaurant
+  }
+
+  convertRangeToDegree = (range: number, isLatitude: boolean): number => {
+    // 대략적인 거리 변환 함수
+    const degreePerKm = isLatitude ? 0.009009 : 0.011236 // 위도일 경우 1Km에 0.009009도, 경도일 경우 1Km에 0.011236도
+    return range * degreePerKm
   }
 }
