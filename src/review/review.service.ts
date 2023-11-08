@@ -7,11 +7,11 @@ import { ReviewRepository } from '../review/review.repository'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ReviewDto } from './dto/review.dto'
 import { Review } from './entities/review.entity'
-import { RestaurantRepository } from 'src/restaurant/restaurant.repository'
-import { User } from 'src/user/entities/user.entity'
-import { UserRepository } from 'src/user/user.repository'
+import { RestaurantRepository } from '../restaurant/restaurant.repository'
+import { User } from '../user/entities/user.entity'
+import { UserRepository } from '../user/user.repository'
 import { DataSource } from 'typeorm'
-import { Restaurant } from 'src/restaurant/entities/restaurant.entity'
+import { Restaurant } from '../restaurant/entities/restaurant.entity'
 
 @Injectable()
 export class ReviewService {
@@ -50,10 +50,10 @@ export class ReviewService {
     reviewDto: ReviewDto,
     user: User,
   ): Promise<object> {
-    const queryRunner = this.dataSource.createQueryRunner()
+    const queryRunner = this.dataSource.createQueryRunner() // 트랜잭션 설정
 
     await queryRunner.connect()
-    await queryRunner.startTransaction('READ COMMITTED')
+    await queryRunner.startTransaction('READ COMMITTED') // 트랜잭션 시작
     try {
       const reviewer = await queryRunner.manager.findOne(User, {
         where: { id: user.id },
@@ -84,7 +84,7 @@ export class ReviewService {
       await queryRunner.rollbackTransaction()
       throw new InternalServerErrorException('리뷰 작성에 실패했습니다.')
     } finally {
-      await queryRunner.release()
+      await queryRunner.release() // 트랜잭션 해제
     }
   }
 
