@@ -1,5 +1,5 @@
-import { Restaurant } from 'src/restaurant/entities/restaurant.entity'
-import { User } from 'src/user/entities/user.entity'
+import { Restaurant } from '../../restaurant/entities/restaurant.entity'
+import { User } from '../../user/entities/user.entity'
 import {
   BaseEntity,
   Column,
