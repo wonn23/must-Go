@@ -8,7 +8,7 @@ import { Restaurant } from './entities/restaurant.entity'
 import { TypeOrmExModule } from 'src/common/decorator/typeoprm-ex.module'
 import { RestaurantRepository } from './restaurant.repository'
 import { PassportModule } from '@nestjs/passport'
-import { Review } from 'src/review/entities/review.entity'
+import { Review } from '../review/entities/review.entity'
 import { ReviewRepository } from 'src/review/review.repository'
 
 @Module({

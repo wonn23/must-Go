@@ -1,4 +1,4 @@
-import { Review } from 'src/review/entities/review.entity'
+import { Review } from '../../review/entities/review.entity'
 import {
   BaseEntity,
   Column,

@@ -12,8 +12,8 @@ import { ReviewService } from './review.service'
 import { AuthGuard } from '@nestjs/passport'
 import { ReviewDto } from './dto/review.dto'
 import { Review } from './entities/review.entity'
-import { GetUser } from 'src/auth/get-user.decorator'
-import { User } from 'src/user/entities/user.entity'
+import { GetUser } from '../auth/get-user.decorator'
+import { User } from '../user/entities/user.entity'
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -72,8 +72,8 @@ export class ReviewController {
     @Param('restaurantId') restaurantId: string,
     @Body() reviewDto: ReviewDto,
     @GetUser() user: User,
-  ): Promise<object> {
-    return await this.reviewService.createReview(+restaurantId, reviewDto, user)
+  ): Promise<void> {
+    await this.reviewService.createReview(+restaurantId, reviewDto, user)
   }
 
   @ApiOperation({ summary: '리뷰 수정' })
