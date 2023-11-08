@@ -11,6 +11,8 @@ import { ReviewModule } from './review/review.module'
 import { RegionModule } from './region/region.module'
 import { RedisCacheModule } from './cache/cache.module'
 
+import { WebhookModule } from './webhook/webhook.module'
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +38,7 @@ import { RedisCacheModule } from './cache/cache.module'
     ReviewModule,
     RedisCacheModule,
     RegionModule,
+    WebhookModule,
   ],
 })
 export class AppModule {}

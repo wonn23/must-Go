@@ -18,10 +18,9 @@ export class CacheService implements ICacheService {
     }
   }
 
-  async setCache<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async setCache<T>(key: string, value: T, ttl: number): Promise<void> {
     try {
-      if (ttl) await this.cacheManager.set(key, value, ttl)
-      else await this.cacheManager.set(key, value)
+      await this.cacheManager.set(key, value, ttl)
     } catch (err) {
       console.error('캐시 데이터 설정 실패', err)
     }

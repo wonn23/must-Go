@@ -1,4 +1,4 @@
-import { Review } from 'src/review/entities/review.entity'
+import { Review } from '../../review/entities/review.entity'
 import {
   BaseEntity,
   Column,
@@ -39,4 +39,8 @@ export class User extends BaseEntity {
   @OneToOne(() => Refresh, { nullable: true })
   @JoinColumn()
   refresh: Refresh
+
+  @Column({ nullable: false, type: 'varchar', default: '' })
+  discordUrl: string
+
 }

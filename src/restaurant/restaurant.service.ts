@@ -26,28 +26,20 @@ export class RestaurantService {
   ) {}
 
   async getRestaurantsInRange(query: GetRestaurantDto): Promise<object[]> {
+    // range 내 식당과 거리 정보를 반환하는 함수.
     try {
       const restaurants =
         await this.restaurantRepository.getRestaurantsInRange(query)
-      const { lat, lon, range, orderBy } = query
-      const point1 = [lon, lat] // 쿼리로 받아온 위치
+      const range = query.range
       const filteredRestaurants = []
 
+      /* Repository에서 반환된 맛집들 중 range(km)내의 맛집들만 배열에 담아줍니다.
+        처음에 사각형 범위로 필터링을 진행했기 때문에, 실제 지정된 범위를 벗어날 수 있습니다.
+        그래서 여기에서 한 번 더 필터링을 진행합니다.*/
       for (let restaurant of restaurants) {
-        let lat2 = Number(restaurant.lat)
-        let lon2 = Number(restaurant.lon)
-        let point2 = [lon2, lat2] // 식당의 위치
-        const distance = this.latLonToKm(point1, point2)
-        if (distance <= range) {
-          const restaurantWithDistance = { ...restaurant, distance }
-          filteredRestaurants.push(restaurantWithDistance)
+        if (restaurant['distance'] <= range) {
+          filteredRestaurants.push(restaurant)
         }
-      }
-
-      if (orderBy === 'Rating') {
-        filteredRestaurants.sort((a, b) => b.score - a.score) // 평점 내림차순 정렬
-      } else if (orderBy === 'Distance') {
-        filteredRestaurants.sort((a, b) => a.distance - b.distance) // 거리 오름차순 정렬
       }
 
       return filteredRestaurants
@@ -59,46 +51,23 @@ export class RestaurantService {
     }
   }
 
-  private toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180)
-  }
-
-  private latLonToKm(point1: number[], point2: number[]): number {
-    const lat1 = point1[1]
-    const lon1 = point1[0]
-    const lat2 = point2[1]
-    const lon2 = point2[0]
-
-    const R = 6371 // km
-    const dLat = this.toRadians(lat2 - lat1)
-    const dLon = this.toRadians(lon2 - lon1)
-
-    const radLat1 = this.toRadians(lat1)
-    const radLat2 = this.toRadians(lat2)
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) *
-        Math.sin(dLon / 2) *
-        Math.cos(radLat1) *
-        Math.cos(radLat2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-    return R * c
-  }
-
   async getRestaurantById(id: number) {
+    //유명 맛집 상세정보 캐싱적용
     const cacheKey = `RestaurantId:${id}`
-    const restaurant = await this.cacheService.getFromCache(cacheKey)
-
-    if (restaurant) return { restaurant }
-
+    const popularRestaurant = await this.cacheService.getFromCache(cacheKey)
+    // 캐싱데이터가 있다면 바로 반환
+    if (popularRestaurant) return { popularRestaurant }
     try {
       const result = await this.restaurantRepository.findRestaurantById(id)
 
-      await this.cacheService.setCache(cacheKey, result, 3600) // Cache for 1 hour
-
-      return { result }
+      const popularRestaurants =
+        await this.restaurantRepository.findPopularRestaurantById(id)
+      // score가 4점이상인 맛집은 캐싱후 반환
+      if (!popularRestaurants) return { result }
+      else {
+        await this.cacheService.setCache(cacheKey, popularRestaurants, 600) // Cache for 10m
+        return { popularRestaurants }
+      }
     } catch (error) {
       throw new InternalServerErrorException(
         '해당 리뷰를 불러오는데 실패했습니다.',

@@ -22,6 +22,7 @@ import {
 import { AuthGuard } from '@nestjs/passport'
 import { Restaurant } from './entities/restaurant.entity'
 
+@ApiBearerAuth()
 @ApiTags('맛집')
 @Controller('restaurants')
 export class RestaurantController {
@@ -29,10 +30,6 @@ export class RestaurantController {
     private readonly restaurantService: RestaurantService,
     private readonly scheduleService: ScheduleService,
   ) {}
-  // @Get()
-  // async getRestaurantData() {
-  //   return await this.scheduleService.getRestaurantData()
-  // }
 
   @ApiOperation({ summary: '설정 지역 범위 내 맛집 조회' })
   @ApiResponse({

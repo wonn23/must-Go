@@ -16,10 +16,10 @@ export class GetRestaurantDto {
   lon: number
 
   @ApiProperty({
-    required: true,
+    required: false,
     enum: ['Distance', 'Rating'],
     type: String,
-    description: '정렬 순서',
+    description: '정렬 순서 (default: Distance)',
   })
   @IsOptional()
   @IsString()
