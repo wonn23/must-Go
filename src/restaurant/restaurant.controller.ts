@@ -18,6 +18,7 @@ import {
   ApiParam,
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
 import { Restaurant } from './entities/restaurant.entity'
