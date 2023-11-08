@@ -51,8 +51,11 @@ export class AuthService {
 
       return { accessToken, refreshToken }
     } catch (error) {
-      console.log(error)
-      throw new InternalServerErrorException(error)
+      if (error instanceof UnprocessableEntityException) {
+        console.log('Unprocessable Entity Exception:', error.message)
+      } else if (error instanceof UnauthorizedException) {
+        console.log('Unauthorized Exception:', error.message)
+      } else throw new InternalServerErrorException(error)
     }
   }
 
