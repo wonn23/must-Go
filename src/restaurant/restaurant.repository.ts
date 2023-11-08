@@ -74,4 +74,14 @@ export class RestaurantRepository extends Repository<Restaurant> {
     const degreePerKm = isLatitude ? 0.009009 : 0.011236 // 위도일 경우 1Km에 0.009009도, 경도일 경우 1Km에 0.011236도
     return range * degreePerKm
   }
+
+  async findPopularRestaurantById(id: number) {
+    const popularRestaurant = await this.createQueryBuilder('popularRestaurant')
+      .leftJoinAndSelect('popularRestaurant.reviews', 'review')
+      .where('popularRestaurant.id = :id', { id })
+      .andWhere('popularRestaurant.score >= 4')
+      .orderBy('review.createdAt', 'DESC')
+      .getOne()
+    return popularRestaurant
+  }
 }
