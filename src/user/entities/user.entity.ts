@@ -39,4 +39,8 @@ export class User extends BaseEntity {
   @OneToOne(() => Refresh, { nullable: true })
   @JoinColumn()
   refresh: Refresh
+
+  @Column({ nullable: false, type: 'varchar', default: '' })
+  discordUrl: string
+
 }

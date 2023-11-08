@@ -9,6 +9,10 @@ import scheduleConfig from './config/schedule.config'
 import { ScheduleModule } from '@nestjs/schedule'
 import { ReviewModule } from './review/review.module'
 import { RegionModule } from './region/region.module'
+import { RedisCacheModule } from './cache/cache.module'
+
+import { WebhookModule } from './webhook/webhook.module'
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,7 +36,9 @@ import { RegionModule } from './region/region.module'
     UserModule,
     RestaurantModule,
     ReviewModule,
+    RedisCacheModule,
     RegionModule,
+    WebhookModule,
   ],
 })
 export class AppModule {}
