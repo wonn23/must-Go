@@ -34,7 +34,7 @@
 
 <div align="center">
 
-언어 및 사용 도구 <br/> ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![Swagger](https://img.shields.io/badge/swagger-%.svg?style=for-the-badge&logo=swagger&logoColor=white)
+언어 및 사용 도구 <br/> ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![Swagger](https://img.shields.io/badge/swagger-%ffffff.svg?style=for-the-badge&logo=swagger&logoColor=white)
 <br/>
 데이터 베이스 <br/>![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)<br/>
 
@@ -100,7 +100,7 @@ Swagger : http://localhost:{port}/swagger#/
 
 [프로젝트 관리 페이지](https://www.notion.so/dev-j/must-Go-077b850837b743fbbbd59cc33a7e51ca?pvs=4)
 
-<img src="./public/timeline.PNG" alt="logo" width="90%" />
+<img src="./public/timeline.png" alt="logo" width="90%" />
 
 <br/>
 
@@ -203,7 +203,8 @@ Swagger : http://localhost:{port}/swagger#/
 
 - **유저 대상자 조회**
 
-  1. 점심 추천 서비스를이용하는지 여부가 담긴 컬럼 [user]lunch_service_yn이 true인 유저2.. 유저 개인이 등록한 디스코드 웹훅 url을 담고 있는 컬럼 [user]discord_url이 ''(빈 스트링 값)이 아닌 유저
+  1. 점심 추천 서비스를이용하는지 여부가 담긴 컬럼 `[user]lunch_service_yn`이 `true`인 유저
+  2. 유저 개인이 등록한 디스코드 웹훅 url을 담고 있는 컬럼 `[user]discord_url`이 `''`(빈 스트링 값)이 아닌 유저
 
 - **거리 계산**
 
@@ -247,6 +248,7 @@ Swagger : http://localhost:{port}/swagger#/
 </br>
 
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+
 <a href="https://github.com/u00938">김유영</a> <a href="https://github.com/keeepmin94">유지민</a> <a href="https://github.com/enxxi">이은석</a> <br/>
 <a href="https://github.com/J-A-Y2">정재훈</a> <a href="https://github.com/wonn23">허창원</a>
 
