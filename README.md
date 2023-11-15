@@ -1,5 +1,6 @@
-<img src="./public/logo.png" alt="logo" width="100%" />
-
+<div align="center">
+  <img src="./public/logo.png" alt="logo" width="60%" />
+</div>
 # 지리기반 맛집 추천 웹 서비스
 
 **내 위치 또는 지정한 위치 기반으로 맛집을 추천합니다**
